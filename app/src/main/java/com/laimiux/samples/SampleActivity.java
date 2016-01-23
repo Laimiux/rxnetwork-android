@@ -24,9 +24,9 @@ public class SampleActivity extends Activity {
     sendButton = (Button) findViewById(R.id.send_button);
 
     final Observable<ButtonState> sendStateStream =
-        RxNetwork.stream(this).map(new Func1<RxNetwork.State, ButtonState>() {
-          @Override public ButtonState call(RxNetwork.State state) {
-            if (state == RxNetwork.State.NOT_CONNECTED) {
+        RxNetwork.stream(this).map(new Func1<Boolean, ButtonState>() {
+          @Override public ButtonState call(Boolean hasInternet) {
+            if (!hasInternet) {
               return new ButtonState(R.string.not_connected, false);
             }
 
