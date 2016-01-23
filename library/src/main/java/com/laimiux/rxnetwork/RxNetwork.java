@@ -21,12 +21,6 @@ import rx.functions.Func1;
  * <pre>
  */
 public class RxNetwork {
-    public enum State {
-        NOT_CONNECTED,
-        MOBILE,
-        WIFI
-    }
-
     private RxNetwork() {
         // No instances
     }
@@ -37,30 +31,28 @@ public class RxNetwork {
      * @param context Context
      * @return Connectivity State
      */
-    public static State getConnectivityStatus(Context context) {
+    public static boolean getConnectivityStatus(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (null != activeNetwork) {
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
-                return State.WIFI;
+        return null != activeNetwork && activeNetwork.isConnected();
 
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE)
-                return State.MOBILE;
-        }
-        return State.NOT_CONNECTED;
     }
 
-    public static Observable<State> stream(Context context) {
+    /**
+     * Creates an observable that Listens to connectivity changes
+     * @param context
+     * @return
+     */
+    public static Observable<Boolean> stream(Context context) {
         final Context applicationContext = context.getApplicationContext();
         final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        final Observable<State> stateStream =
-                ContentObservable.fromBroadcast(context, action).map(new Func1<Intent, State>() {
-                    @Override public State call(Intent intent) {
-                        return getConnectivityStatus(applicationContext);
-                    }
-                });
+        final Observable<Boolean> stateStream =
+            ContentObservable.fromBroadcast(context, action).map(new Func1<Intent, Boolean>() {
+                @Override public Boolean call(Intent intent) {
+                    return getConnectivityStatus(applicationContext);
+                }
+            });
 
-        return stateStream.startWith(getConnectivityStatus(applicationContext));
+        return stateStream.startWith(getConnectivityStatus(context)).distinctUntilChanged();
     }
 }
