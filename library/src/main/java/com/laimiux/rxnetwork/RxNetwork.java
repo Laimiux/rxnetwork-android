@@ -51,6 +51,6 @@ public class RxNetwork {
           @Override public Boolean call(Intent ignored) {
             return getConnectivityStatus(applicationContext);
           }
-        });
+        }).distinctUntilChanged();
   }
 }
