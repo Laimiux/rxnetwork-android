@@ -16,5 +16,5 @@ RxNetwork.stream(context)
 
 ### Download
 ```java
-compile 'com.laimiux.rxnetwork:rxnetwork:0.0.3'
+compile 'com.laimiux.rxnetwork:rxnetwork:0.0.4'
 ```
