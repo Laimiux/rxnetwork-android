@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
-class OnSubscribeBroadcastRegister implements Observable.OnSubscribe<Intent> {
+
+class OnSubscribeBroadcastRegister implements ObservableOnSubscribe<Intent> {
 
     private final Context context;
     private final IntentFilter intentFilter;
@@ -26,24 +26,27 @@ class OnSubscribeBroadcastRegister implements Observable.OnSubscribe<Intent> {
         this.schedulerHandler = schedulerHandler;
     }
 
+
     @Override
-    public void call(final Subscriber<? super Intent> subscriber) {
+    public void subscribe(final ObservableEmitter<Intent> e) throws Exception {
         final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                subscriber.onNext(intent);
+                e.onNext(intent);
             }
         };
-
-        final Subscription subscription = Subscriptions.create(new Action0() {
+        final CompositeDisposable compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(new Disposable() {
             @Override
-            public void call() {
+            public void dispose() {
                 context.unregisterReceiver(broadcastReceiver);
             }
+
+            @Override
+            public boolean isDisposed() {
+                return false;
+            }
         });
-
-        subscriber.add(subscription);
         context.registerReceiver(broadcastReceiver, intentFilter, broadcastPermission, schedulerHandler);
-
     }
 }

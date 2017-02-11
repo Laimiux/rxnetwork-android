@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import rx.Observable;
+import io.reactivex.Observable;
+
 
 final class ContentObservable {
     private ContentObservable() {
