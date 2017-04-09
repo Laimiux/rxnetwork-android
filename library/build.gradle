@@ -21,7 +21,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // Rx java
-    compile 'io.reactivex:rxjava:1.0.15'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.4'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

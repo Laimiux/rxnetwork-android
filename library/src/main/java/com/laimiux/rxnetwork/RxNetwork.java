@@ -7,8 +7,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 
 /**
@@ -21,36 +21,35 @@ import rx.functions.Func1;
  * <pre>
  */
 public class RxNetwork {
-  private RxNetwork() {
-    // No instances
-  }
+    private RxNetwork() {
+        // No instances
+    }
 
-  /**
-   * Helper function that returns the connectivity state
-   *
-   * @param context Context
-   * @return Connectivity State
-   */
-  public static boolean getConnectivityStatus(Context context) {
-    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    return null != activeNetwork && activeNetwork.isConnected();
+    /**
+     * Helper function that returns the connectivity state
+     *
+     * @param context Context
+     * @return Connectivity State
+     */
+    public static boolean getConnectivityStatus(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return null != activeNetwork && activeNetwork.isConnected();
 
-  }
+    }
 
-  /**
-   * Creates an observable that listens to connectivity changes
-   */
-  public static Observable<Boolean> stream(Context context) {
-    final Context applicationContext = context.getApplicationContext();
-    final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-    return ContentObservable.fromBroadcast(context, action)
-        // To get initial connectivity status
-        .startWith((Intent) null)
-        .map(new Func1<Intent, Boolean>() {
-          @Override public Boolean call(Intent ignored) {
-            return getConnectivityStatus(applicationContext);
-          }
-        }).distinctUntilChanged();
-  }
+    /**
+     * Creates an observable that listens to connectivity changes
+     */
+    public static Observable<Boolean> stream(Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        return ContentObservable.fromBroadcast(context, action)
+                .map(new Function<Intent, Boolean>() {
+                    @Override
+                    public Boolean apply(Intent intent) throws Exception {
+                        return getConnectivityStatus(applicationContext);
+                    }
+                }).distinctUntilChanged();
+    }
 }
