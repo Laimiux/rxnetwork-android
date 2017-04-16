@@ -1,5 +1,5 @@
 # rxnetwork-android
-A simple util and example of how to track connectivity changes in Android applications.
+A simple util and example of how to track connectivity changes in Android applications...
 
 
 ### How to use
